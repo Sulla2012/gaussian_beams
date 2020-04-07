@@ -35,3 +35,13 @@ def make_file(filename, size = 128, res = 0.1, center = None, data_spacing = 0.0
     return
 
 make_file('LATR_280_gaus', res = 0.015)
+
+gaus, ig, nore = make_gaus('test')
+
+print(gaus[64][64])
+
+y = gaus[64]
+x = np.arange(0, len(y))
+
+plt.plot(x,y)
+plt.show()
