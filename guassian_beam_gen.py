@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import re
+from scipy import optimize
 
 def gaus2d(x,y, x0, y0, res):
     return np.exp(-4*np.log(2) * (((x - x0)**2 + (y - y0)**2) / (res*2)**2))
@@ -47,7 +49,7 @@ def load_beam_txt(filename):
     meta = {}
     mode = 'preamble'
     data = []
-    for line in open(fn, 'rb'):
+    for line in open(filename, 'rb'):
         line = line.decode('latin_1')
         #print(mode)
         if mode == 'preamble':
@@ -89,5 +91,25 @@ def make_file(filename, size = 128, res = 0.1, center = None, data_spacing = 0.0
     return
 
 
-make_file('LATR_280_gaus_10x_zoom', size = 128, res = 0.015, data_spacing = 0.01)
+#make_file('LATR_280_gaus_10x_zoom', size = 128, res = 0.015, data_spacing = 0.01)
 
+data, meta = load_beam_txt('LAT_beam_1100um_center_tube1.TXT')
+
+#Following two functions courtousy of Scipy cookbook
+def gaussian(center_x, center_y, width_x, width_y):
+    """Returns a gaussian function with the given parameters"""
+    width_x = float(width_x)
+    width_y = float(width_y)
+    return lambda x,y: np.exp(
+                -(((center_x-x)/width_x)**2+((center_y-y)/width_y)**2)/2)
+
+def fitgaussian(data):
+    """Returns (height, x, y, width_x, width_y)
+    the gaussian parameters of a 2D distribution found by a fit"""
+    params = [64, 64, 1.5, 1.5]
+    errorfunction = lambda p: np.ravel(gaussian(*p)(*np.indices(data.shape)) -
+                                 data)
+    p, succes = optimize.leastsq(errorfunction, params)
+    return p
+
+print(fitgaussian(data)[1])
