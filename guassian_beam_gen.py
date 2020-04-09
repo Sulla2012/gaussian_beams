@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import re
 from scipy import optimize
+from scipy.optimize import curve_fit
 
 def gaus2d(x,y, x0, y0, res):
     return np.exp(-4*np.log(2) * (((x - x0)**2 + (y - y0)**2) / (res*2)**2))
@@ -106,10 +107,93 @@ def gaussian(center_x, center_y, width_x, width_y):
 def fitgaussian(data):
     """Returns (height, x, y, width_x, width_y)
     the gaussian parameters of a 2D distribution found by a fit"""
-    params = [64, 64, 1.5, 1.5]
+    params = [9, 9, .7, .7]
     errorfunction = lambda p: np.ravel(gaussian(*p)(*np.indices(data.shape)) -
                                  data)
     p, succes = optimize.leastsq(errorfunction, params)
     return p
 
-print(fitgaussian(data)[1])
+#p= fitgaussian(data)
+
+#gaus = gaussian(*p)
+
+x = np.arange(0, 128, 1, float)
+y = x[:,np.newaxis]
+
+
+
+"""
+plt.imshow(np.log(gaus(x,y)))
+plt.savefig('LAT_2020_fit_gaus.pdf')
+plt.show()
+
+res = data - gaus(x,y)
+plt.imshow(np.log(res))
+plt.savefig('LAT_2020_residual.pdf')
+plt.show()
+
+#print(np.argmax(data)/128)
+#print(np.argmax(gaus(x,y))/128)
+
+testgaus = gaussian (10,10,1,1)
+testx = np.arange(0,20,0.1, float)
+testy = testx[:, np.newaxis]
+ptest = fitgaussian(testgaus(testx, testy))
+
+print(ptest)
+"""
+X, Y = np.meshgrid(x,y)
+xdata = np.vstack((X.ravel(), Y.ravel()))
+print(xdata)
+p0 = [65,65,.1,.1,10,10, .5]
+
+def _gaussian(M, *args):
+    x, y = M
+    arr = np.zeros(x.shape)
+    arr += gaussian(*args[0:4])(x,y)+args[6]*gaussian(args[0],args[1],args[4],args[5])(x,y)
+    return arr
+
+popt, pcov = curve_fit(_gaussian, xdata, data.ravel(),p0)
+print(popt)
+
+gaus2 = gaussian(*popt[0:4])(x,y) + popt[6]*gaussian(popt[0],popt[1],popt[4],popt[5])(x,y)
+
+plt.imshow(np.log(gaus2))
+plt.savefig('LAT_2020_fit_gaus.pdf')
+plt.show()
+
+res2 = data-gaus2
+plt.imshow(np.log(res2))
+plt.savefig('LAT_2020_residual.pdf')
+plt.show()
+
+midpoint = int(len(res2[1])/2)
+
+yslice = res2[midpoint]
+xmin, xmax = -0.64, 0.64
+xslice = np.linspace(xmin, xmax, len(y))
+
+plt.plot(xslice, np.log(yslice))
+plt.xlim(xmin, xmax)
+plt.ylim(-20,0)
+#plt.axvline(x = -res, color = 'r')
+#plt.axvline(x = res, color = 'r')
+plt.savefig('residual_central_slice.pdf')
+plt.show()
+
+
+datamax = np.argmax(data)
+print(data.ravel()[datamax])
+"""
+print(np.argmax(gaus2(x,y))/128)
+
+testX, testY = np.meshgrid(testx, testy)
+
+testxdata = np.vstack((testX.ravel(), testY.ravel()))
+
+p1 = [9, 9, .7, .8]
+
+testpopt, testpcov = curve_fit(_gaussian, testxdata, testgaus(testx, testy).ravel(), p1)
+print(testpopt)
+
+"""
