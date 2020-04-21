@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import re
+import re, os, pickle
 from scipy import optimize
 from scipy.optimize import curve_fit
 
@@ -97,11 +97,11 @@ def make_file(filename, size = 128, res = 0.1, center = None, data_spacing = 0.0
 data, meta = load_beam_txt('LAT_beam_1100um_center_tube1.TXT')
 
 #Following two functions courtousy of Scipy cookbook
-def gaussian(center_x, center_y, width_x, width_y):
+def gaussian(scale, center_x, center_y, width_x, width_y):
     """Returns a gaussian function with the given parameters"""
     width_x = float(width_x)
     width_y = float(width_y)
-    return lambda x,y: np.exp(
+    return lambda x,y: scale*np.exp(
                 -(((center_x-x)/width_x)**2+((center_y-y)/width_y)**2)/2)
 
 def fitgaussian(data):
@@ -144,19 +144,20 @@ print(ptest)
 """
 X, Y = np.meshgrid(x,y)
 xdata = np.vstack((X.ravel(), Y.ravel()))
+print("X data")
 print(xdata)
-p0 = [65,65,.1,.1,10,10, .5]
+p0 = [1,65,65,.1,.1]
 
 def _gaussian(M, *args):
     x, y = M
     arr = np.zeros(x.shape)
-    arr += gaussian(*args[0:4])(x,y)+args[6]*gaussian(args[0],args[1],args[4],args[5])(x,y)
+    arr += gaussian(*args[0:5])(x,y)
     return arr
 
 popt, pcov = curve_fit(_gaussian, xdata, data.ravel(),p0)
 print(popt)
 
-gaus2 = gaussian(*popt[0:4])(x,y) + popt[6]*gaussian(popt[0],popt[1],popt[4],popt[5])(x,y)
+gaus2 = gaussian(*popt[0:5])(x,y)
 
 plt.imshow(np.log(gaus2))
 plt.savefig('LAT_2020_fit_gaus.pdf')
@@ -197,3 +198,45 @@ testpopt, testpcov = curve_fit(_gaussian, testxdata, testgaus(testx, testy).rave
 print(testpopt)
 
 """
+print("Starting SAT Beams")
+sat_beam = pickle.load(open('fitting_det0000_90_test2_wide.pkl', 'rb'))
+
+plt.imshow(np.log(sat_beam['data']), extent = [-32.12481, 17.87519,  16.29601, -33.70399])
+plt.show()
+
+X, Y = sat_beam['mesh'][0], sat_beam['mesh'][1]
+xdata = np.vstack((X.ravel(), Y.ravel()))
+
+p0 = [1,-7,-8,.5,.5]
+
+popt, pcov = curve_fit(_gaussian, xdata, sat_beam['data'].ravel(),p0)
+print(popt)
+
+x = np.linspace(-32.12481, 17.87519, 1001)
+y = np.linspace(-33.70399, 16.29601, 1001)
+y = y[:, np.newaxis]
+gaus2 = gaussian(*popt[0:5])(x,y)
+print(gaus2.shape)
+plt.imshow(np.log(gaus2), extent = [-32.12481, 17.87519,  16.29601, -33.70399])
+plt.savefig('SAT_90_0000_wide_fit_gaus.pdf')
+plt.show()
+
+res2 = sat_beam['data']-gaus2
+plt.imshow(np.log(res2), extent = [-32.12481, 17.87519,  16.29601, -33.70399])
+plt.savefig('SAT_90_0000_wide_residual.pdf')
+plt.show()
+
+midpoint = int(len(res2[1])/2)
+
+yslice = res2[midpoint]
+xmin, xmax = -0.64, 0.64
+xslice = np.linspace(xmin, xmax, len(y))
+
+plt.plot(xslice, np.log(yslice))
+plt.xlim(xmin, xmax)
+plt.ylim(-20,0)
+#plt.axvline(x = -res, color = 'r')
+#plt.axvline(x = res, color = 'r')
+plt.savefig('residual_central_slice.pdf')
+plt.show()
+

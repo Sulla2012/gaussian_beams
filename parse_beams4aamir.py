@@ -64,7 +64,6 @@ def parse_data(nus=[90], run_str1='test2', run_str2='test2_wide',
 
     fname1 = det1 + '.pkl'
     fname2 = det2 + '.pkl'
-
     results1 = pickle.load(open(rdir+fname1, 'rb'))
     prop1 = pickle.load(open(rdir+fname1.replace('.pkl','_prop.pkl'), 'rb'))
     results2 = pickle.load(open(rdir+fname2, 'rb'))
@@ -75,12 +74,16 @@ def parse_data(nus=[90], run_str1='test2', run_str2='test2_wide',
 
     print(results1.keys())
     print(prop1.keys())
-
-    print(results1['cr'])
-    print(results1['numel'])
+    
+    print(results2['cr'])
 
     bsa1 = degsq2srad(bsa(arr11, get_da(results1['cr'], results1['numel'])))
     bsa2 = degsq2srad(bsa(arr12, get_da(results2['cr'], results2['numel'])))
+    
+    forfitting = {}
+    forfitting['data'] = arr12
+    forfitting['mesh'] = get_mesh(results2['cr'], results2['numel'])
+    pickle.dump(forfitting, open('fitting_'+fname2, 'wb'))
 
     fg1 = 4*np.pi/bsa1
     fg2 = 4*np.pi/bsa2
