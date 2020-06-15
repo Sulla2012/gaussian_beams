@@ -199,9 +199,9 @@ print(testpopt)
 
 """
 print("Starting SAT Beams")
-sat_beam = pickle.load(open('fitting_det0000_90_test2_wide.pkl', 'rb'))
+sat_beam = pickle.load(open('fitting_det0000_90_test2_wide.pkl', 'rb'), encoding = 'bytes')
 
-plt.imshow(np.log(sat_beam['data']), extent = [-32.12481, 17.87519,  16.29601, -33.70399])
+plt.imshow(np.log(sat_beam[b'data']), extent = [-32.12481, 17.87519,  16.29601, -33.70399])
 plt.savefig("SAT_beam.pdf")
 plt.show()
 
