@@ -52,38 +52,38 @@ def bsa(arr, dA, maxval=None, normalize=True):
 
     return dA * np.sum(arr)
 
-def parse_data(nus=[90], run_str1='test2', run_str2='test2_wide',
+def parse_data(nus=[90], run_str1='test1', run_str2='test1_wide',
     rdir='pkl/', idir='img_profiles/'):
 
     nu = np.mean(nus)
 
-    i = 0
+    i = 64
     det = det_name(i, nus)
     det1 = det + '_{}'.format(run_str1)
     det2 = det + '_{}'.format(run_str2)
 
     fname1 = det1 + '.pkl'
     fname2 = det2 + '.pkl'
-    results1 = pickle.load(open(rdir+fname1, 'rb'))
-    prop1 = pickle.load(open(rdir+fname1.replace('.pkl','_prop.pkl'), 'rb'))
-    results2 = pickle.load(open(rdir+fname2, 'rb'))
-    prop2 = pickle.load(open(rdir+fname2.replace('.pkl','_prop.pkl'), 'rb'))
+    results1 = pickle.load(open(rdir+fname1, 'rb'), encoding = 'bytes')
+    prop1 = pickle.load(open(rdir+fname1.replace('.pkl','_prop.pkl'), 'rb'), encoding = 'bytes')
+    results2 = pickle.load(open(rdir+fname2, 'rb'), encoding = 'bytes')
+    prop2 = pickle.load(open(rdir+fname2.replace('.pkl','_prop.pkl'), 'rb'), encoding = 'bytes')
 
-    arr11 = (np.abs(results1['e_co'])**2).astype('float32')
-    arr12 = (np.abs(results2['e_co'])**2).astype('float32')
+    arr11 = (np.abs(results1[b'e_co'])**2).astype('float32')
+    arr12 = (np.abs(results2[b'e_co'])**2).astype('float32')
 
     print(results1.keys())
     print(prop1.keys())
     
-    print(results2['cr'])
+    #print(results1[b'co'])
 
-    bsa1 = degsq2srad(bsa(arr11, get_da(results1['cr'], results1['numel'])))
-    bsa2 = degsq2srad(bsa(arr12, get_da(results2['cr'], results2['numel'])))
+    bsa1 = degsq2srad(bsa(arr11, get_da(results1[b'cr'], results1[b'numel'])))
+    bsa2 = degsq2srad(bsa(arr12, get_da(results2[b'cr'], results2[b'numel'])))
     
     forfitting = {}
-    forfitting['data'] = arr12
-    forfitting['mesh'] = get_mesh(results2['cr'], results2['numel'])
-    pickle.dump(forfitting, open('fitting_'+fname2, 'wb'))
+    forfitting['data'] = arr11
+    #forfitting['mesh'] = get_mesh(results2[b'cr'], results2[b'numel'])
+    pickle.dump(forfitting, open('fitting_'+fname1, 'wb'))
 
     fg1 = 4*np.pi/bsa1
     fg2 = 4*np.pi/bsa2

@@ -199,10 +199,12 @@ print(testpopt)
 
 """
 print("Starting SAT Beams")
-sat_beam = pickle.load(open('fitting_det0000_90_test2_wide.pkl', 'rb'), encoding = 'bytes')
+name = 'fitting_det0064_90_test1'
+sat_beam = pickle.load(open(name + '.pkl', 'rb'), encoding = 'bytes')
 
-plt.imshow(np.log(sat_beam[b'data']), extent = [-32.12481, 17.87519,  16.29601, -33.70399])
-plt.savefig("SAT_beam.pdf")
+plt.imshow(np.log(sat_beam['data']), extent = [-32.12481, 17.87519,  16.29601, -33.70399])
+plt.title(name)
+plt.savefig(name + "_beam.pdf")
 plt.show()
 
 X, Y = sat_beam['mesh'][0], sat_beam['mesh'][1]
