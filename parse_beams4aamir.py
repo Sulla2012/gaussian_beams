@@ -69,8 +69,8 @@ def parse_data(nus=[90], run_str1='test1', run_str2='test1_wide',
     results2 = pickle.load(open(rdir+fname2, 'rb'), encoding = 'bytes')
     prop2 = pickle.load(open(rdir+fname2.replace('.pkl','_prop.pkl'), 'rb'), encoding = 'bytes')
 
-    arr11 = (np.abs(results1[b'e_co'])**2).astype('float32')
-    arr12 = (np.abs(results2[b'e_co'])**2).astype('float32')
+    arr11 = (np.abs(results1[b'e_cx'])**2).astype('float32')
+    arr12 = (np.abs(results2[b'e_cx'])**2).astype('float32')
 
     print(results1.keys())
     print(prop1.keys())
@@ -83,7 +83,7 @@ def parse_data(nus=[90], run_str1='test1', run_str2='test1_wide',
     forfitting = {}
     forfitting['data'] = arr11
     #forfitting['mesh'] = get_mesh(results2[b'cr'], results2[b'numel'])
-    pickle.dump(forfitting, open('fitting_'+fname1, 'wb'))
+    pickle.dump(forfitting, open('cx_fitting_'+fname1, 'wb'))
 
     fg1 = 4*np.pi/bsa1
     fg2 = 4*np.pi/bsa2
@@ -93,15 +93,15 @@ def parse_data(nus=[90], run_str1='test1', run_str2='test1_wide',
     print(fname1)
     print(fname2)
 
-    pco1 = prop1['pow_co']
-    pco2 = prop2['pow_co']
-    pcx1 = prop1['pow_cx']
-    pcx2 = prop2['pow_cx']
+    pco1 = prop1[b'pow_co']
+    pco2 = prop2[b'pow_co']
+    pcx1 = prop1[b'pow_cx']
+    pcx2 = prop2[b'pow_cx']
 
     lstr1 = 'Det #{}'.format(i+1)
     lstr2 = 'Det #{} w/window scattering'.format(i+1)
 
-    theta = np.linspace(prop1['theta_min'], prop1['theta_max'], prop1['ntheta'])
+    theta = np.linspace(prop1[b'theta_min'], prop1[b'theta_max'], prop1[b'ntheta'])
     plt.plot(theta, 10*np.log10(fg1*pco1[1]/np.max(pco1[1])), label=lstr1, color=cw[0])
     plt.plot(theta, 10*np.log10(fg2*pco2[1]/np.max(pco2[1])), label=lstr2, color=cw[1], ls='--')
 

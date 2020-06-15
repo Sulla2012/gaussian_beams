@@ -199,7 +199,7 @@ print(testpopt)
 
 """
 print("Starting SAT Beams")
-name = 'fitting_det0064_90_test1'
+name = 'cx_fitting_det0064_90_test1'
 sat_beam = pickle.load(open(name + '.pkl', 'rb'), encoding = 'bytes')
 
 plt.imshow(np.log(sat_beam['data']), extent = [-32.12481, 17.87519,  16.29601, -33.70399])
