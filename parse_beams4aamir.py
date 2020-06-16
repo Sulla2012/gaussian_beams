@@ -82,7 +82,7 @@ def parse_data(nus=[90], run_str1='test1', run_str2='test1_wide',
     
     forfitting = {}
     forfitting['data'] = arr11
-    forfitting['mesh'] = get_mesh(results2['cr'], results2['numel'])
+    forfitting['mesh'] = get_mesh(results1['cr'], results1['numel'])
     pickle.dump(forfitting, open('fitting_'+fname1, 'wb'))
 
     fg1 = 4*np.pi/bsa1
