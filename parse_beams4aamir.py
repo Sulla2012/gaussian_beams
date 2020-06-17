@@ -87,8 +87,10 @@ def parse_data(nus=[90], run_str1='test1', run_str2='test1_wide',
 
     foraamir = {}
     foraamir['data'] = arr11
-    len_mesh = forfitting['mesh'][len(forfitting['mesh'])]-forfitting['mesh'][0]
-    print('Mesh length: {}'.format(len_mesh))
+    len_mesh = abs(forfitting['mesh'][0][0][len(forfitting['mesh'][0][0])-1]-forfitting['mesh'][0][0][0])
+    pitch_mesh = abs(forfitting['mesh'][0][0][0]-forfitting['mesh'][0][0][1])
+    foraamir['size'] = [[round(len_mesh, 2), round(pitch_mesh, 3)], [len(forfitting['data'][0]), 1.0]]
+    pickle.dump(foraamir, open('aamir_'+fname1, 'wb'))
 
     fg1 = 4*np.pi/bsa1
     fg2 = 4*np.pi/bsa2
