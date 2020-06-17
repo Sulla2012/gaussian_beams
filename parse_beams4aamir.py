@@ -85,6 +85,11 @@ def parse_data(nus=[90], run_str1='test1', run_str2='test1_wide',
     forfitting['mesh'] = get_mesh(results1['cr'], results1['numel'])
     pickle.dump(forfitting, open('fitting_'+fname1, 'wb'))
 
+    foraamir = {}
+    foraamir['data'] = arr11
+    len_mesh = forfitting['mesh'][len(forfitting['mesh'])]-forfitting['mesh'][0]
+    print('Mesh length: {}'.format(len_mesh))
+
     fg1 = 4*np.pi/bsa1
     fg2 = 4*np.pi/bsa2
 
