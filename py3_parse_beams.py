@@ -33,7 +33,7 @@ def get_da(cr, numel, mult=1):
 
     return ((float(cr[2])-float(cr[0]))/(mult*float(numel[0])))**2
 
-def get_mesh(cr, numel, mult=1.0):
+def get_mesh(cr, numel, mult=1):
 
     xx, yy = np.meshgrid(np.linspace(cr[0], cr[2], mult*numel[0]),
         np.linspace(cr[1], cr[3], mult*numel[1]))
@@ -64,25 +64,25 @@ def parse_data(nus=[90], run_str1='test1', run_str2='test1_wide',
 
     fname1 = det1 + '.pkl'
     fname2 = det2 + '.pkl'
-    results1 = pickle.load(open(rdir+fname1, 'rb'))#, encoding = 'bytes')
-    prop1 = pickle.load(open(rdir+fname1.replace('.pkl','_prop.pkl'), 'rb'))#, encoding = 'bytes')
-    results2 = pickle.load(open(rdir+fname2, 'rb'))#, encoding = 'bytes')
-    prop2 = pickle.load(open(rdir+fname2.replace('.pkl','_prop.pkl'), 'rb'))#, encoding = 'bytes')
+    results1 = pickle.load(open(rdir+fname1, 'rb'), encoding = 'bytes')
+    prop1 = pickle.load(open(rdir+fname1.replace('.pkl','_prop.pkl'), 'rb'), encoding = 'bytes')
+    results2 = pickle.load(open(rdir+fname2, 'rb'), encoding = 'bytes')
+    prop2 = pickle.load(open(rdir+fname2.replace('.pkl','_prop.pkl'), 'rb'), encoding = 'bytes')
 
-    arr11 = (np.abs(results1['e_cx'])**2).astype('float32')
-    arr12 = (np.abs(results2['e_cx'])**2).astype('float32')
+    arr11 = (np.abs(results1[b'e_cx'])**2).astype('float32')
+    arr12 = (np.abs(results2[b'e_cx'])**2).astype('float32')
 
     print(results1.keys())
     print(prop1.keys())
     
     #print(results1[b'co'])
 
-    bsa1 = degsq2srad(bsa(arr11, get_da(results1['cr'], results1['numel'])))
-    bsa2 = degsq2srad(bsa(arr12, get_da(results2['cr'], results2['numel'])))
+    bsa1 = degsq2srad(bsa(arr11, get_da(results1[b'cr'], results1[b'numel'])))
+    bsa2 = degsq2srad(bsa(arr12, get_da(results2[b'cr'], results2[b'numel'])))
     
     forfitting = {}
     forfitting['data'] = arr11
-    forfitting['mesh'] = get_mesh(results1['cr'], results1['numel'])
+    forfitting['mesh'] = get_mesh(results1[b'cr'], results1[b'numel'])
     pickle.dump(forfitting, open('fitting_'+fname1, 'wb'))
 
     foraamir = {}
@@ -92,7 +92,8 @@ def parse_data(nus=[90], run_str1='test1', run_str2='test1_wide',
     foraamir['size'] = [[round(len_mesh, 2), round(pitch_mesh, 3)], [len(forfitting['data'][0]), 1.0]]
     print(len(forfitting['data'][0]))
     pickle.dump(foraamir, open('aamir_'+fname1, 'wb'))
-
+    
+    """
     fg1 = 4*np.pi/bsa1
     fg2 = 4*np.pi/bsa2
 
@@ -128,6 +129,7 @@ def parse_data(nus=[90], run_str1='test1', run_str2='test1_wide',
     plt.savefig(opj(idir, '{}_co_zoom1'.format(det)), dpi=300, bbox_inches='tight')
 
     plt.close()
+    """
 
 def main():
 
