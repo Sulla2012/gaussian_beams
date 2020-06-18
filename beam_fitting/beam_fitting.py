@@ -99,7 +99,8 @@ for det in det_table['det_uid']:
     radius = np.arcsin(np.sqrt(xi_det_center**2 + eta_det_center**2))
     idx_t = np.where(radius < np.radians(radius_cut/60))[0]
     xi_cut = xi_det_center[idx_t]
-    eta_cut = eta_det_center[idx_t] 
+    eta_cut = eta_det_center[idx_t]
+    print(xi_cut)
     data_cut = data_det[idx_t]
     xieta = np.vstack((xi_cut, eta_cut))
     popt, _ = curve_fit(gaussian2d, xieta, data_cut, 
